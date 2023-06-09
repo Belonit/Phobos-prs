@@ -202,6 +202,20 @@ In `artmd.ini`:
 HideIfNoOre.Threshold=0  ; integer, minimal ore growth stage
 ```
 
+### Remappable animations
+
+- You can now make animations remap to their owner's team color by setting `RemapAnim` to true. Such animations are always drawn with unit palette (similar to `MakeInfantry` animations) and require the animation to have owner set.
+
+In `artmd.ini`:
+```ini
+[SOMEANIM]       ; AnimationType
+RemapAnim=false  ; boolean
+```
+
+```{note}
+Due to technical constraints, infantry death animations including Ares' `InfDeathAnim` cannot have `RemapAnim` correctly applied to them. You can use Ares' `MakeInfantryOwner` and a `MakeInfantry` value that doesn't produce infantry as a workaround for this.
+```
+
 ## Buildings
 
 ### Airstrike target eligibility

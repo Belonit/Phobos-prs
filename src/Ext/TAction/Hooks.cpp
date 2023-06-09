@@ -59,7 +59,7 @@ DEFINE_HOOK(0x6E427D, TActionClass_CreateBuildingAt, 0x9)
 		}
 		else
 		{
-			if(!bPlayBuildUp)
+			if (!bPlayBuildUp)
 				pBld->Place(false);
 
 			pBld->IsReadyToCommence = true;
@@ -129,11 +129,9 @@ DEFINE_HOOK(0x6E2368, TActionClass_PlayAnimAt, 0x7)
 
 	if (pAnim)
 	{
-		auto const pTypeExt = AnimTypeExt::ExtMap.Find(pAnim->Type);
+		AnimExt::SetAnimOwnerHouseKind(pAnim, pHouse, pHouse, pHouse);
 
-		if (auto unit = pTypeExt->CreateUnit.Get())
-			AnimExt::SetAnimOwnerHouseKind(pAnim, pHouse, pHouse, pHouse);
-		else if (!pAnim->Owner && pHouse)
+		if (!pAnim->Owner && pHouse)
 			pAnim->Owner = pHouse;
 	}
 

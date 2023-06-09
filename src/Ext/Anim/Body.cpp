@@ -40,13 +40,31 @@ void AnimExt::ExtData::DeleteAttachedSystem()
 const bool AnimExt::SetAnimOwnerHouseKind(AnimClass* pAnim, HouseClass* pInvoker, HouseClass* pVictim, bool defaultToVictimOwner)
 {
 	auto const pTypeExt = AnimTypeExt::ExtMap.Find(pAnim->Type);
-	auto newOwner = HouseExt::GetHouseKind(pTypeExt->CreateUnit_Owner.Get(), true, defaultToVictimOwner ? pVictim : nullptr, pInvoker, pVictim);
+	bool makeInf = pAnim->Type->MakeInfantry > -1;
+	bool createUnit = pTypeExt->CreateUnit.Get();
+	auto ownerKind = pTypeExt->RemapAnim ? OwnerHouseKind::Invoker : OwnerHouseKind::Default;
+	HouseClass* pDefaultOwner = defaultToVictimOwner && (makeInf || createUnit) ? pVictim : nullptr;
+
+	if (makeInf)
+		ownerKind = pTypeExt->MakeInfantryOwner;
+	else if (createUnit)
+		ownerKind = pTypeExt->CreateUnit_Owner;
+	else
+		pDefaultOwner = pInvoker;
+
+	auto newOwner = HouseExt::GetHouseKind(ownerKind, true, pDefaultOwner, pInvoker, pVictim);
 
 	if (newOwner)
 	{
 		pAnim->Owner = newOwner;
+		bool isRemappable = pTypeExt->RemapAnim;
 
-		if (pTypeExt->CreateUnit_RemapAnim.Get() && !newOwner->Defeated)
+		if (makeInf)
+			isRemappable = true;
+		else if (createUnit)
+			isRemappable = pTypeExt->CreateUnit_RemapAnim;
+
+		if (isRemappable && !newOwner->Defeated)
 			pAnim->LightConvert = ColorScheme::Array->Items[newOwner->ColorSchemeIndex]->LightConvert;
 	}
 
