@@ -1,6 +1,7 @@
 #include "Body.h"
 
-#include <Helpers\Macro.h>
+#include <Ext/Anim/Body.h>
+#include <Helpers/Macro.h>
 
 #include <HouseClass.h>
 #include <BuildingClass.h>
@@ -116,6 +117,24 @@ DEFINE_HOOK(0x6E2EA7, TActionClass_Retint_LightSourceFix, 0x3) // Red
 
 			pRadSite->LightSource->Activate();
 		}
+	}
+
+	return 0;
+}
+
+DEFINE_HOOK(0x6E2368, TActionClass_PlayAnimAt, 0x7)
+{
+	GET(AnimClass*, pAnim, EAX);
+	GET_STACK(HouseClass*, pHouse, STACK_OFFSET(0x18, 0x4));
+
+	if (pAnim)
+	{
+		auto const pTypeExt = AnimTypeExt::ExtMap.Find(pAnim->Type);
+
+		if (auto unit = pTypeExt->CreateUnit.Get())
+			AnimExt::SetAnimOwnerHouseKind(pAnim, pHouse, pHouse, pHouse);
+		else if (!pAnim->Owner && pHouse)
+			pAnim->Owner = pHouse;
 	}
 
 	return 0;
